@@ -5,7 +5,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-public class Util {
+public class Util { // unused class may use in future
 
     private Minecraft mc = Minecraft.getMinecraft();
 
