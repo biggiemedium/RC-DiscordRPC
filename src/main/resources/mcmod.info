@@ -1,0 +1,16 @@
+[
+{
+  "modid": "discordrpc",
+  "name": "Discord RPC",
+  "description": "Discord RPC developed by PX for HighQ for his mod Realisticraft.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/biggiemedium",
+  "updateUrl": "",
+  "authorList": ["PX"],
+  "credits": "PX and HighQ and OU821",
+  "logoFile": "assets/nightsky2.jpg",
+  "screenshots": [],
+  "dependencies": []
+}
+]

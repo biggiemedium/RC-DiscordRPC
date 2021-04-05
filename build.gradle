@@ -1,0 +1,113 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "https://files.minecraftforge.net/maven" }
+
+        maven {
+            name = 'gradle plugins'
+            url "https://plugins.gradle.org/m2/"
+        }
+
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.9'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.matthewprenger.cursegradle'
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+
+allprojects {
+    repositories {
+        maven {
+            name = "jitpack.io"
+            url = "https://jitpack.io"
+        }
+
+
+        mavenCentral()
+        jcenter()
+    }
+}
+
+version = "1.0"
+group = "dev.px.realisticraft"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+
+minecraft {
+    version = "1.12.2-14.23.0.2531"
+    runDir = "run"
+    makeObfSourceJar = true
+    mappings = "snapshot_20171003"
+
+}
+
+repositories {
+
+    maven {
+        name = "jitpack.io"
+        url = "https://jitpack.io"
+    }
+
+
+    mavenCentral()
+    jcenter()
+
+}
+
+dependencies {
+    //implementation 'club.minnced:java-discord-rpc:2.0.2'
+    //shadow 'club.minnced:java-discord-rpc:2.0.2'
+    compile group: 'club.minnced', name: 'java-discord-rpc', version: '2.0.1'
+}
+
+shadowJar {
+    dependencies {
+        include(dependency('club.minnced:java-discord-rpc:2.0.1'))
+    }
+    exclude 'dummyThing'
+    exclude 'LICENSE.txt'
+    classifier = 'FINAL'
+}
+
+reobf {
+    shadowJar {}
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+
+    archiveName("DiscordRPC" + version)
+    shadowJar {}
+
+}
+//build.build.dependsOn(shadowJar)
+
+build.dependsOn(shadowJar)
+
+//tasks.reobfJar.dependsOn(tasks.shadowJar)
