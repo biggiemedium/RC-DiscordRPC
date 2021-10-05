@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 public class Util { // unused class may use in future
 
-    private Minecraft mc = Minecraft.getMinecraft();
+    private static Minecraft mc = Minecraft.getMinecraft();
 
     public static void ClearonJoin(int lines) {
         for (int i = 0; i < lines; i++) {
@@ -20,9 +20,8 @@ public class Util { // unused class may use in future
     }
 
     public static void sendClientMessage(String text) {
-        if (Minecraft.getMinecraft().ingameGUI != null || Minecraft.getMinecraft().player == null) {
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(text));
+        if(mc.player != null && mc.world != null) {
+            mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(text));
         }
-
     }
 }

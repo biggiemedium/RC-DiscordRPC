@@ -3,6 +3,7 @@ package dev.px.realisticraft;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -31,6 +32,12 @@ public class Main
     @EventHandler
     public void startRPC(FMLInitializationEvent event) {
      rpc.Start();
+    }
 
+    @SubscribeEvent
+    public void onJoin(EntityJoinWorldEvent event) {
+        if(event.getWorld() == Minecraft.getMinecraft().world && event.getEntity() == Minecraft.getMinecraft().player) {
+            Util.sendClientMessage("Discord RPC Mod made by PX!");
+        }
     }
 }

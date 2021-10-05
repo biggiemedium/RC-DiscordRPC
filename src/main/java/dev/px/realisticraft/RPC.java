@@ -6,8 +6,8 @@ import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.server.management.PlayerList;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreenServerList;
 import net.minecraft.util.math.MathHelper;
 
 public class RPC {
@@ -17,7 +17,7 @@ public class RPC {
     private  String user = mc.getSession().getUsername();
 
     private DiscordRichPresence presence = new DiscordRichPresence();
-    private Thread _thread = null;
+    private Thread thread = null;
 
     public void Start() {
 
@@ -30,30 +30,24 @@ public class RPC {
 
         lib.Discord_UpdatePresence(presence);
         presence.largeImageKey = "icon";
-        _thread = new Thread(() ->
-        {
-            while (!Thread.currentThread().isInterrupted())
-            {
+        this.thread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
                 lib.Discord_RunCallbacks();
                 presence.details = setDetails();
                 presence.state = setState();
                 lib.Discord_UpdatePresence(presence);
-                try
-                {
+                try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored)
-                {
-                }
+                } catch (InterruptedException ignored) {}
             }
         }, "RPC-Callback-Handler");
 
-        _thread.start();
+        thread.start();
     }
 
-    public static float getSpeedInKM()
-    {
-        final double deltaX = Minecraft.getMinecraft().player.posX - Minecraft.getMinecraft().player.prevPosX;
-        final double deltaZ = Minecraft.getMinecraft().player.posZ - Minecraft.getMinecraft().player.prevPosZ;
+    public static float getSpeedInKM() {
+        double deltaX = Minecraft.getMinecraft().player.posX - Minecraft.getMinecraft().player.prevPosX;
+        double deltaZ = Minecraft.getMinecraft().player.posZ - Minecraft.getMinecraft().player.prevPosZ;
 
         float distance = MathHelper.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
@@ -65,6 +59,10 @@ public class RPC {
             formatter += ".0";
 
         return Float.valueOf(formatter);
+    }
+
+    public void Stop() {
+
     }
 
     private String setState() { // mc.player != null will run first
@@ -82,24 +80,16 @@ public class RPC {
             return "Cooling off";
         }
 
+        if(mc.player != null && mc.player.onGround && mc.player.moveStrafing == 0 && mc.player.moveForward == 0) {
+            return "Standing";
+        }
+
         if(mc.player != null && mc.player.onGround) {
             return "Moving " + getSpeedInKM() + " KMH";
         }
 
-        if(mc.player != null && getSpeedInKM() == 0 && mc.player.onGround) {
-            return "Standing";
-        }
-
         if(!mc.player.onGround && mc.player != null) {
             return "Chilling in " + mc.world.getBiome(mc.player.getPosition()).getBiomeName();
-        }
-
-        if(mc.player.isInvisible()) {
-            return "Hididng";
-        }
-
-        if(mc.player.isSwingInProgress) {
-            return "Punching";
         }
 
         if(mc.player.isOnLadder()) {
@@ -118,25 +108,21 @@ public class RPC {
             return "In spectator";
         }
 
-        if(mc.player.isElytraFlying()) {
-            return "Flying";
-        }
-
-
         return back;
     }
 
     private String setDetails() {
         String detail = discordRichPresence.details;
 
-        if(mc.player == null)
+        if(mc.player == null && mc.currentScreen instanceof GuiMainMenu) {
             return user + " | " + "In menu";
+        }
 
-        if(mc.player != null || mc.isSingleplayer()) {
+        if(mc.player != null || mc.isIntegratedServerRunning()) {
             return user + " | " + "Singleplayer" + " | " + "Gaming";
         }
 
-        if(mc.player != null || !mc.isSingleplayer() || mc.getCurrentServerData().isOnLAN() || mc.getCurrentServerData().serverIP.contains("9")) {
+        if(mc.player != null && !mc.isIntegratedServerRunning() && mc.getCurrentServerData() != null && !mc.getCurrentServerData().serverIP.equals("")) {
             return user + " | " + "Multiplayer" + " | " + "Gaming";
         }
 
