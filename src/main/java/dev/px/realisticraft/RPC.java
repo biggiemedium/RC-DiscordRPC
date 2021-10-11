@@ -5,6 +5,7 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreenServerList;
@@ -18,10 +19,9 @@ public class RPC {
 
     private DiscordRichPresence presence = new DiscordRichPresence();
     private Thread thread = null;
+    private DiscordRPC lib = DiscordRPC.INSTANCE;
 
     public void Start() {
-
-        DiscordRPC lib = DiscordRPC.INSTANCE;
         String applicationId = "803057502786551808";
         String steamId = "";
         DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -45,9 +45,9 @@ public class RPC {
         thread.start();
     }
 
-    public static float getSpeedInKM() {
-        double deltaX = Minecraft.getMinecraft().player.posX - Minecraft.getMinecraft().player.prevPosX;
-        double deltaZ = Minecraft.getMinecraft().player.posZ - Minecraft.getMinecraft().player.prevPosZ;
+    public float getSpeedInKM() {
+        double deltaX = this.mc.player.posX - this.mc.player.prevPosX;
+        double deltaZ = this.mc.player.posZ - this.mc.player.prevPosZ;
 
         float distance = MathHelper.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
@@ -62,7 +62,11 @@ public class RPC {
     }
 
     public void Stop() {
-
+        if(!(this.thread == null) && !this.thread.isInterrupted()) {
+            this.thread.interrupt();
+        }
+        this.lib.Discord_ClearPresence();
+        this.lib.Discord_Shutdown();
     }
 
     private String setState() { // mc.player != null will run first
@@ -88,7 +92,7 @@ public class RPC {
             return "Moving " + getSpeedInKM() + " KMH";
         }
 
-        if(!mc.player.onGround && mc.player != null) {
+        if(!mc.player.onGround) {
             return "Chilling in " + mc.world.getBiome(mc.player.getPosition()).getBiomeName();
         }
 
@@ -128,6 +132,5 @@ public class RPC {
 
         return detail;
     }
-
 }
 

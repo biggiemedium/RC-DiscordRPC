@@ -10,6 +10,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
@@ -24,19 +26,20 @@ public class Main
     private static RPC rpc = new RPC();
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
     }
 
     @EventHandler
     public void startRPC(FMLInitializationEvent event) {
-     rpc.Start();
+        rpc.Start();
     }
 
     @SubscribeEvent
-    public void onJoin(EntityJoinWorldEvent event) {
-        if(event.getWorld() == Minecraft.getMinecraft().world && event.getEntity() == Minecraft.getMinecraft().player) {
+    public void onJoin(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        if(event.isLocal()) {
+            Util.sendClientMessage("Discord RPC made by PX! You are on a local server right now");
+        } else {
             Util.sendClientMessage("Discord RPC Mod made by PX!");
         }
     }

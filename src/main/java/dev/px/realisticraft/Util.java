@@ -11,7 +11,7 @@ public class Util { // unused class may use in future
 
     public static void ClearonJoin(int lines) {
         for (int i = 0; i < lines; i++) {
-           // Minecraft.getMinecraft().player.sendMessage(new TextComponentString(""));
+            mc.player.sendMessage(new TextComponentString(""));
         }
     }
     @SubscribeEvent
